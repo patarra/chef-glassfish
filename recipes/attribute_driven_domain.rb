@@ -807,28 +807,6 @@ gf_sort(node['glassfish']['domains']).each_pair do |domain_key, definition|
     end
   end
 
-  Chef::Log.info "Defining GlassFish Domain #{domain_key} - scanning existing applications"
-  gf_scan_existing_resources(admin_port,
-                             username,
-                             password_file,
-                             secure,
-                             'list-applications') do |application_name|
-    Chef::Log.info "Defining GlassFish Domain #{domain_key} - scanning existing application #{application_name}"
-    unless definition['deployables'].keys.include?(application_name)
-      Chef::Log.info "Defining GlassFish Domain #{domain_key} - undeploying existing resource #{application_name}"
-      glassfish_deployable application_name do
-        domain_name domain_key
-        admin_port admin_port if admin_port
-        username username if username
-        password_file password_file if password_file
-        secure secure if secure
-        system_user system_username if system_username
-        system_group system_group if system_group
-        action :undeploy
-      end
-    end
-  end
-
   Chef::Log.info "Defining GlassFish Domain #{domain_key} - checking web-env entry for existing resources"
   gf_sort(definition['deployables'] || {}).each_pair do |component_name, configuration|
     next if configuration['type'] && configuration['type'].to_s == 'osgi'
